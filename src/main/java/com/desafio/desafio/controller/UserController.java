@@ -50,8 +50,10 @@ public class UserController {
 	public User addHoras(@PathVariable(value = "id") Long id, @Valid @RequestBody User user) {
 	    User novo = repository.findById(id).get(); 
 	    novo.setHours(user.getHours() + novo.getHours());
-	    User atualizado = repository.save(novo);
-	    return atualizado;
+	    novo.getRegistro().add(user.getHours());
+	    repository.save(novo);
+	    
+	    return novo;
 	}
 	
 	@GetMapping("/registro/{id}")
@@ -64,8 +66,19 @@ public class UserController {
 	@PutMapping("/registro/{id}")
 	public User registrarHora(@PathVariable(value = "id") Long id, @Valid @RequestBody User user) {		
 		    User novo = repository.findById(id).get(); 
-		    novo.setHours(user.getHours() + novo.getHours());
-		    novo.getRegistro().add(user.getHours());
+		    //novo.setHours(user.getHours() + novo.getHours());
+		    //novo.getRegistro().add(user.getHours());
+		    novo.getRegistro().addAll(user.getRegistro());
+		    
+		    if(!user.getRegistro().isEmpty()) {
+		    	int auxiliar = 0;
+		    	for(int aux : user.getRegistro()) {
+		    		auxiliar = aux + auxiliar;
+		    		
+		    	}
+		    	novo.setHours(auxiliar + novo.getHours());
+		    }
+		    
 		    User atualizado = repository.save(novo);
 		    return atualizado;
 	}	
